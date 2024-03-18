@@ -98,7 +98,7 @@ public:
 
 		newNode->prev = currentNode->prev;
 		newNode->next = currentNode;
-		currentNode->prev->next = newNode;
+		currentNode->prev->next = newNode; // (currentNode->prev)의 next = newNode
 		currentNode->prev = newNode;
 		size++;
 	}
@@ -155,11 +155,6 @@ public:
 		size--;
 	}
 
-	int Size()
-	{
-		return size;
-	}
-
 	void Show()
 	{
 		Node* currentNode = head;
@@ -169,6 +164,11 @@ public:
 			cout << currentNode->data << endl;
 			currentNode = currentNode->next;
 		}
+	}
+
+	int Size()
+	{
+		return size;
 	}
 
 	~DoubleLinkedList()

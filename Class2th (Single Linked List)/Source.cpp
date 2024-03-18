@@ -115,7 +115,7 @@ public:
 
 int main()
 {
-	SingleLinkedList<int> SingleLinkedList;
+	/*SingleLinkedList<int> SingleLinkedList;
 
 	SingleLinkedList.PushFront(100);
 	SingleLinkedList.PushFront(99);
@@ -125,7 +125,7 @@ int main()
 
 	cout << "Single Linked List의 크기 : " << SingleLinkedList.Size() << endl;
 
-	SingleLinkedList.Show();
+	SingleLinkedList.Show();*/
 
 	return 0;
 }
