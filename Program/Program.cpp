@@ -1,98 +1,121 @@
 ﻿#include <iostream>
 using namespace std;
 
-class Vector2
+template <typename T>
+class Vector
 {
+private:
+	int size;
+	int capacity;
+
+	T* bufferPointer;
+
 public:
-	int x;
-	int y;
-
-	Vector2(int x, int y)
+	Vector()
 	{
-		this->x = x;
-		this->y = y;
+		size = 0;
+		capacity = 0;
+
+		bufferPointer = nullptr;
 	}
 
-	// 연산자 오버로딩(operator)
-	Vector2 operator+(const Vector2 & vector)
+	void Resize(int newSize)
 	{
-		Vector2 other(this->x + vector.x, this->y + vector.y);
+		// 1. capacity에 새로운 newSize 값 설정합니다.
+		capacity = newSize;
 
-		return other;
+		// 2. 새로운 포인터 변수를 생성해서 새롭게 만들어진 메모리 공간을 가리키게 합니다.
+		T* newPointer = new T[capacity];
+
+		// 3. 새로운 메모리 공간에 값을 초기화합니다.
+		for (int i = 0; i < capacity; i++)
+		{
+			newPointer[i] = NULL;
+		}
+
+		// 4. 기존 배열에 있는 값을 복사해서 새로운 배열에 넣어줍니다.
+		for (int i = 0; i < size; i++)
+		{
+			newPointer[i] = bufferPointer[i];
+		}
+
+		// 5. bufferPointer의 메모리 주소를 해제합니다.
+		if (bufferPointer != nullptr)
+		{
+			delete [] bufferPointer;
+		}
+
+		// 6. bufferPointer에 새로운 메모리 주소를 저장합니다.
+		bufferPointer = newPointer;
 	}
 
-	Vector2 operator-(const Vector2& vector)
+	void PushBack(T data)
 	{
-		Vector2 other(this->x - vector.x, this->y - vector.y);
-
-		return other;
+		if (capacity == 0)
+		{
+			Resize(1);
+		}
+		else if (size >= capacity)
+		{
+			Resize(capacity * 2);
+		}
+		bufferPointer[size++] = data;
 	}
 
-	Vector2 operator*(const Vector2& vector)
+	void PopBack()
 	{
-		Vector2 other(this->x * vector.x, this->y * vector.y);
-
-		return other;
+		if (size <= 0)
+		{
+			cout << "Vector is Empty" << endl;
+			return;
+		}
+		else
+		{
+			bufferPointer[--size] = NULL;
+		}
 	}
 
-	Vector2 operator*(int value)
+	void Reserve(int newSize)
 	{
-		Vector2 other(this->x * value, this->y * value);
-
-		return other;
+		if (capacity > newSize)
+		{
+			return;
+		}
+		Resize(newSize);
 	}
 
-	Vector2 operator/(const Vector2& vector)
+	T& operator[](const int& index)
 	{
-		Vector2 other(this->x / vector.x, this->y / vector.y);
+		return bufferPointer[index];
+	}
 
-		return other;
+	int& Size()
+	{
+		return size;
+	}
+
+	~Vector()
+	{
+		if (bufferPointer != nullptr)
+		{
+			delete [] bufferPointer;
+		}
 	}
 };
 
-Vector2 operator*(int value, Vector2 vector)
-{
-	return vector * value;
-}
-
 int main()
 {
-	Vector2 vector1(10, 20);
-	Vector2 vector2(5, 5);
+	Vector<int> vector;
 
-	Vector2 plus = vector1 + vector2;
-	cout << "plus의 x 값 : " << plus.x << endl;
-	cout << "plus의 y 값 : " << plus.y << endl;
+	vector.PushBack(10);
+	vector.PushBack(20);
+	vector.PushBack(30);
+	vector.PopBack();
 
-	cout << endl;
-
-	Vector2 minus = vector1 - vector2;
-	cout << "minus의 x 값 : " << minus.x << endl;
-	cout << "minus의 y 값 : " << minus.y << endl;
-
-	cout << endl;
-
-	Vector2 multiple = vector1 * vector2;
-	cout << "multiple의 x 값 : " << multiple.x << endl;
-	cout << "multiple의 y 값 : " << multiple.y << endl;
-
-	cout << endl;
-
-	Vector2 divide = vector1 / vector2;
-	cout << "divide의 x 값 : " << divide.x << endl;
-	cout << "divide의 y 값 : " << divide.y << endl;
-
-	cout << endl;
-
-	Vector2 vector3 = vector1 * 5;
-	cout << "vector3의 x 값 : " << vector3.x << endl;
-	cout << "vector3의 y 값 : " << vector3.y << endl;
-
-	cout << endl;
-
-	Vector2 vector4 = 10 * vector1;
-	cout << "vector4의 x 값 : " << vector4.x << endl;
-	cout << "vector4의 y 값 : " << vector4.y << endl;
+	for (int i = 0; i < vector.Size(); i++)
+	{
+		cout << vector[i] << endl;
+	}
 
 	return 0;
 }
