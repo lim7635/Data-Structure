@@ -1,134 +1,107 @@
 ﻿#include <iostream>
-#define SIZE 10
 using namespace std;
 
-template <typename T>
-class Stack
+#pragma region 트리(Tree)
+// Tree 구조는 검색할 때 주로 사용
+
+// Node : data, Node * left, Node * right로 구성
+// root : 최상위 Node
+// edge : Node와 Node를 연결하는 간선
+// parent : 자신보다 하위 Node를 가지고 있는 Node를 의미(부모 Node)
+// child : 자신보다 상위 Node를 가지고 있는 Node를 의미(자식 Node)
+// leaf : 자식 Node를 가지지 않는 Node를 의미
+// level : root로 부터 그 하위 단계를 측정하는 것 (위 -> 아래)
+// height : level 반대(아래 -> 위)
+// path : Node와 Node 사이간에 나타나는 Node와 간선의 순서
+// degree : 해당 Node가 포함하는 자식 Node의 수
+
+struct Node
 {
-private:
-	int top;
+	int data;
 
-	T buffer[SIZE];
-
-public:
-	Stack()
-	{
-		top = -1;
-
-		for (int i = 0; i < SIZE; i++)
-		{
-			buffer[i] = NULL;
-		}
-	}
-
-	void Push(T data)
-	{
-		if (top == SIZE - 1)
-		{
-			cout << "Stack is Full" << endl;
-		}
-		else
-		{
-			buffer[++top] = data;
-		}
-	}
-
-	T Pop()
-	{
-		if (top <= -1)
-		{
-			cout << "Stack is Empty" << endl;
-		}
-		else
-		{
-			return buffer[top--];
-		}
-	}
-
-	bool Empty()
-	{
-		if (top <= -1)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	bool IsFull()
-	{
-		if (top == SIZE - 1)
-		{
-			return true;
-		}
-		return false;
-	}
-
-	T& Top()
-	{
-		if (top <= -1)
-		{
-			exit(1);
-		}
-		return buffer[top];
-	}
+	Node* left;
+	Node* right;
 };
 
-bool CheckBracket(string content)
+Node * CreateNode(int data, Node * left, Node * right)
 {
-	Stack<char> stack;
-	for (int i = 0; i < content.length(); i++)
-	{
-		char character = content[i];
-		if (character == '(' || character == '{' || character == '[')
-		{
-			stack.Push(character);
-		}
-		else if (content[i] == ')' || content[i] == '}' || content[i] == ']')
-		{
-			char alphabet = stack.Pop();
-			switch (alphabet)
-			{
-			case '(': if (character != ')') { return false; }
-				break;
+	// 1. 새로운 Node 생성
+	Node* newNode = new Node;
 
-			case '{': if (character != '}') { return false; }
-				break;
+	// 2. 새로운 Node에 data값 저장
+	newNode->data = data;
 
-			case '[': if (character != ']') { return false; }
-				break;
+	// 3. 새로운 Node에 left값 저장
+	newNode->left = left;
 
-			default:
-				break;
-			}
-		}
-	}
+	// 4. 새로운 Node에 right값 저장
+	newNode->right = right;
 
-	if (stack.Empty() == true)
-	{
-		return true;
-	}
-	return false;
+	// 5. 새로운 Node의 주소값 반환
+	return newNode;
 }
+
+// 전위 순회
+// 1. Root Node 방문
+// 2. 왼쪽 서브 트리를 전위 순회합니다.
+// 3. 오른쪽 서브 트리를 전위 순회합니다.
+void Preorder(Node * root)
+{
+	if (root != nullptr)
+	{
+		cout << root->data << " ";
+		Preorder(root->left);
+		Preorder(root->right);
+	}
+}
+
+// 중위 순회
+// 1. 왼쪽 서브 트리를 중위 순회합니다.
+// 2. Root Node 방문
+// 3. 오른쪽 서브 트리를 중위 순회합니다.
+void Inorder(Node * root)
+{
+	if (root != nullptr)
+	{
+		Inorder(root->left);
+		cout << root->data << " ";
+		Inorder(root->right);
+	}
+}
+
+// 후위 순회
+// 1. 왼쪽 서브 트리를 후위 순회합니다.
+// 2. 오른쪽 서브 트리를 후위 순회합니다.
+// 3. Root Node 방문
+void Postorder(Node * root)
+{
+	if (root != nullptr)
+	{
+		Postorder(root->left);
+		Postorder(root->right);
+		cout << root->data << " ";
+	}
+}
+#pragma endregion
 
 int main()
 {
-	/*Stack<int> stack;
+	Node* node7 = CreateNode(7, nullptr, nullptr);
+	Node* node6 = CreateNode(6, nullptr, nullptr);
+	Node* node5 = CreateNode(5, nullptr, nullptr);
+	Node* node4 = CreateNode(4, nullptr, nullptr);
+	Node* node3 = CreateNode(3, node6, node7);
+	Node* node2 = CreateNode(2, node4, node5);
+	Node* node1 = CreateNode(1, node2, node3);
 
-	stack.Push(10);
-	stack.Push(20);
-	stack.Push(30);
-	stack.Push(40);
-	stack.Push(50);*/
+	Preorder(node1);
+	cout << endl;
 
-	bool flag = CheckBracket("({[]})");
-	if (flag == true)
-	{
-		cout << "성공" << endl;
-	}
-	else if(flag == false)
-	{
-		cout << "실패" << endl;
-	}
+	Inorder(node1);
+	cout << endl;
+
+	Postorder(node1);
+	cout << endl;
 
 	return 0;
 }
