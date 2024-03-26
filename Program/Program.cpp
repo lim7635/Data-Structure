@@ -1,107 +1,134 @@
 ﻿#include <iostream>
+#define SIZE 8
 using namespace std;
 
-#pragma region 트리(Tree)
-// Tree 구조는 검색할 때 주로 사용
+#pragma region 완전 이진 트리(Complete Binary Tree)
+// 최댓값 또는 최솟값을 구할 때 사용하기 용이함
 
-// Node : data, Node * left, Node * right로 구성
-// root : 최상위 Node
-// edge : Node와 Node를 연결하는 간선
-// parent : 자신보다 하위 Node를 가지고 있는 Node를 의미(부모 Node)
-// child : 자신보다 상위 Node를 가지고 있는 Node를 의미(자식 Node)
-// leaf : 자식 Node를 가지지 않는 Node를 의미
-// level : root로 부터 그 하위 단계를 측정하는 것 (위 -> 아래)
-// height : level 반대(아래 -> 위)
-// path : Node와 Node 사이간에 나타나는 Node와 간선의 순서
-// degree : 해당 Node가 포함하는 자식 Node의 수
+// 조건
+// 최대(최소) 힙 : 꼭대기
+// 왼쪽 Node가 항상 있어야한다.
+// 부모 Node가 자식 Node보다 항상 커야한다.
 
-struct Node
+// 배열 (노드 개수 + 1 만큼 생성)
+// 왼쪽 자식의 인덱스 : 부모 노드의 인덱스 X 2
+// 오른쪽 자식의 인덱스 : 부모 노드의 인덱스 X 2 + 1
+// 부모의 인덱스 : 자식 노드의 인덱스 / 2
+// 0번째 인덱스 제외하고 사용
+
+template <typename T>
+class Heap
 {
-	int data;
+private:
+	T buffer[SIZE];
 
-	Node* left;
-	Node* right;
+	int index;
+
+public:
+	Heap()
+	{
+		index = 0;
+		for (int i = 0; i < SIZE; i++)
+		{
+			buffer[i] = NULL;
+		}
+	}
+
+	void Insert(T data)
+	{
+		if (index >= SIZE - 1)
+		{
+			cout << "Heap is Full" << endl;
+			return;
+		}
+
+		buffer[++index] = data;
+		int child = index;
+		int parent = index / 2;
+		while (parent != 0)
+		{
+			if (buffer[child] > buffer[parent])
+			{
+				std::swap(buffer[child], buffer[parent]); // using namespace std;가 있을 경우 std:: 생략 가능
+			}
+			child = parent;
+			parent = child / 2;
+		}
+
+		// 위와 같은 방식
+		/*while (child > 1)
+		{
+			// 자식 노드와 부모 노드의 데이터를 비교합니다.
+			if(buffer[parent] < buffer[child])
+			{
+				swap(buffer[parent], buffer[child]);
+			}
+			child = parent;
+			parent = child / 2;
+		}*/
+	}
+
+	T& Delete()
+	{
+		// 1. 힙이 비어있다면 프로그램을 종료합니다.
+		if (index <= 0)
+		{
+			cout << "Heap is Empty" << endl;
+			exit(1);
+		}
+
+		// 2. 임시 변수에 buffer[1]의 값을 보관합니다.
+		T temp = buffer[1];
+
+		// 3. index로 가리키는 배열의 값을 첫 번째 원소에 넣어줍니다.
+		buffer[1] = buffer[index];
+
+		// 4. index로 가리키는 배열의 값을 초기화합니다.
+		buffer[index] = NULL;
+
+		// 5. index의 값을 감소시킵니다.
+		index--;
+
+		int parent = 1;
+		while (parent >= index)
+		{
+			int child = parent * 2;
+			if (buffer[child] > buffer[child + 1])
+			{
+				if (buffer[parent] < buffer[child])
+				{
+					swap(buffer[parent], buffer[child]);
+				}
+				parent = child;
+			}
+			else if (buffer[child] < buffer[child + 1])
+			{
+				if (buffer[parent] < buffer[child + 1])
+				{
+					swap(buffer[parent], buffer[child + 1]);
+				}
+				parent = child + 1;
+			}
+		}
+
+		return temp;
+	}
+
+	void Show()
+	{
+		for (T element : buffer)
+		{
+			cout << element << " ";
+		}
+	}
+
 };
 
-Node * CreateNode(int data, Node * left, Node * right)
-{
-	// 1. 새로운 Node 생성
-	Node* newNode = new Node;
-
-	// 2. 새로운 Node에 data값 저장
-	newNode->data = data;
-
-	// 3. 새로운 Node에 left값 저장
-	newNode->left = left;
-
-	// 4. 새로운 Node에 right값 저장
-	newNode->right = right;
-
-	// 5. 새로운 Node의 주소값 반환
-	return newNode;
-}
-
-// 전위 순회
-// 1. Root Node 방문
-// 2. 왼쪽 서브 트리를 전위 순회합니다.
-// 3. 오른쪽 서브 트리를 전위 순회합니다.
-void Preorder(Node * root)
-{
-	if (root != nullptr)
-	{
-		cout << root->data << " ";
-		Preorder(root->left);
-		Preorder(root->right);
-	}
-}
-
-// 중위 순회
-// 1. 왼쪽 서브 트리를 중위 순회합니다.
-// 2. Root Node 방문
-// 3. 오른쪽 서브 트리를 중위 순회합니다.
-void Inorder(Node * root)
-{
-	if (root != nullptr)
-	{
-		Inorder(root->left);
-		cout << root->data << " ";
-		Inorder(root->right);
-	}
-}
-
-// 후위 순회
-// 1. 왼쪽 서브 트리를 후위 순회합니다.
-// 2. 오른쪽 서브 트리를 후위 순회합니다.
-// 3. Root Node 방문
-void Postorder(Node * root)
-{
-	if (root != nullptr)
-	{
-		Postorder(root->left);
-		Postorder(root->right);
-		cout << root->data << " ";
-	}
-}
 #pragma endregion
 
 int main()
 {
-	Node* node7 = CreateNode(7, nullptr, nullptr);
-	Node* node6 = CreateNode(6, nullptr, nullptr);
-	Node* node5 = CreateNode(5, nullptr, nullptr);
-	Node* node4 = CreateNode(4, nullptr, nullptr);
-	Node* node3 = CreateNode(3, node6, node7);
-	Node* node2 = CreateNode(2, node4, node5);
-	Node* node1 = CreateNode(1, node2, node3);
-
-	Preorder(node1);
-	cout << endl;
-
-	Inorder(node1);
-	cout << endl;
-
-	Postorder(node1);
-	cout << endl;
+	Heap<int> heap;
 
 	return 0;
 }
