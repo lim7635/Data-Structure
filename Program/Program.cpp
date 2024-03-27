@@ -1,134 +1,88 @@
 ﻿#include <iostream>
-#define SIZE 8
+#define SIZE 6
 using namespace std;
 
-#pragma region 완전 이진 트리(Complete Binary Tree)
-// 최댓값 또는 최솟값을 구할 때 사용하기 용이함
+#pragma region 해시 테이블(Hash Table)
+// (Key, Value)로 데이터를 저장하는 자료 구조 중 하나로
+// 빠르게 데이터를 검색할 수 있는 자료 구조입니다.
 
-// 조건
-// 최대(최소) 힙 : 꼭대기
-// 왼쪽 Node가 항상 있어야한다.
-// 부모 Node가 자식 Node보다 항상 커야한다.
+// 해시 충돌을 해결하는 방법
+// 1. 체이닝 기법
+// 각 해시 버킷을 연결 리스트로 구성하는 방식입니다.
+// 해시 충돌 발생 시 동일한 해시 값에 해당하는 데이터들을 연결리스트로 연결하여 저장합니다.
 
-// 배열 (노드 개수 + 1 만큼 생성)
-// 왼쪽 자식의 인덱스 : 부모 노드의 인덱스 X 2
-// 오른쪽 자식의 인덱스 : 부모 노드의 인덱스 X 2 + 1
-// 부모의 인덱스 : 자식 노드의 인덱스 / 2
-// 0번째 인덱스 제외하고 사용
+// 2. 개방 주소법
+// 충돌 발생 시 빈 버킷에 데이터를 저장하는 방식입니다.
+// 빈 버킷을 어떻게 결정할 지에 따라 구현 방식이 달라집니다.
 
-template <typename T>
-class Heap
+// 2.1 선형 탐사 : 충돌 발생 시 앞에서부터 차례대로 빈 버킷을 찾아 저장하는 방식입니다.
+// 2.2 이차 탐사 : 충돌 발생 시 2제곱 또는 2의 3제곱만큼 떨어진 빈 버킷을 찾아 값을 저장하는 방식입니다.
+// 2.3 이중 해싱 : 해시 값을 한번 더 해시 함수에서 다른 함수를 도출하는 방식입니다.
+
+template <typename KEY, typename VALUE>
+class HashTable
 {
 private:
-	T buffer[SIZE];
+	struct Node
+	{
+		KEY key;
+		VALUE value;
 
-	int index;
+		Node* next;
+	};
+
+	struct Bucket
+	{
+		int count;
+
+		Node* head;
+	};
+
+	Bucket bucket[SIZE];
 
 public:
-	Heap()
+	HashTable()
 	{
-		index = 0;
 		for (int i = 0; i < SIZE; i++)
 		{
-			buffer[i] = NULL;
+			bucket[i].count = 0;
+			bucket[i].head = nullptr;
 		}
 	}
 
-	void Insert(T data)
+	template <typename T>
+	int HashFunction(T key)
 	{
-		if (index >= SIZE - 1)
-		{
-			cout << "Heap is Full" << endl;
-			return;
-		}
+		int hashIndex = (int)key % SIZE;
 
-		buffer[++index] = data;
-		int child = index;
-		int parent = index / 2;
-		while (parent != 0)
-		{
-			if (buffer[child] > buffer[parent])
-			{
-				std::swap(buffer[child], buffer[parent]); // using namespace std;가 있을 경우 std:: 생략 가능
-			}
-			child = parent;
-			parent = child / 2;
-		}
-
-		// 위와 같은 방식
-		/*while (child > 1)
-		{
-			// 자식 노드와 부모 노드의 데이터를 비교합니다.
-			if(buffer[parent] < buffer[child])
-			{
-				swap(buffer[parent], buffer[child]);
-			}
-			child = parent;
-			parent = child / 2;
-		}*/
+		return hashIndex;
 	}
 
-	T& Delete()
+	// HashFunction 템플릿 특수화
+	template <>
+	int HashFunction(string key)
 	{
-		// 1. 힙이 비어있다면 프로그램을 종료합니다.
-		if (index <= 0)
+		int sum = 0;
+		for (int i = 0; i < strlen(key); i++)
 		{
-			cout << "Heap is Empty" << endl;
-			exit(1);
+			int hashIndex = key[i] % SIZE;
+			sum += hashIndex;
 		}
 
-		// 2. 임시 변수에 buffer[1]의 값을 보관합니다.
-		T temp = buffer[1];
+		sum = sum % SIZE;
 
-		// 3. index로 가리키는 배열의 값을 첫 번째 원소에 넣어줍니다.
-		buffer[1] = buffer[index];
-
-		// 4. index로 가리키는 배열의 값을 초기화합니다.
-		buffer[index] = NULL;
-
-		// 5. index의 값을 감소시킵니다.
-		index--;
-
-		int parent = 1;
-		while (parent >= index)
-		{
-			int child = parent * 2;
-			if (buffer[child] > buffer[child + 1])
-			{
-				if (buffer[parent] < buffer[child])
-				{
-					swap(buffer[parent], buffer[child]);
-				}
-				parent = child;
-			}
-			else if (buffer[child] < buffer[child + 1])
-			{
-				if (buffer[parent] < buffer[child + 1])
-				{
-					swap(buffer[parent], buffer[child + 1]);
-				}
-				parent = child + 1;
-			}
-		}
-
-		return temp;
+		return sum;
 	}
 
-	void Show()
+	~HashTable()
 	{
-		for (T element : buffer)
-		{
-			cout << element << " ";
-		}
-	}
 
+	}
 };
-
 #pragma endregion
 
 int main()
 {
-	Heap<int> heap;
 
 	return 0;
 }
