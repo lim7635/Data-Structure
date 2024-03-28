@@ -62,16 +62,96 @@ public:
 	template <>
 	int HashFunction(string key)
 	{
-		int sum = 0;
-		for (int i = 0; i < strlen(key); i++)
+		int result = 0;
+		for (const char & element : key)
 		{
-			int hashIndex = key[i] % SIZE;
-			sum += hashIndex;
+			result += (int)element;
 		}
 
-		sum = sum % SIZE;
+		int hashIndex = result % SIZE;
 
-		return sum;
+		return hashIndex;
+	}
+
+	Node* CreateNode(KEY key, VALUE value)
+	{
+		Node* newNode = new Node;
+
+		newNode->key = key;
+		newNode->value = value;
+		newNode->next = nullptr;
+
+		return newNode;
+	}
+
+	void Insert(KEY key, VALUE value)
+	{
+		// 1. 해시 함수를 통해서 값을 받는 임시 변수를 만듭니다.
+		int hashIndex = HashFunction(key);
+
+		// 2. 새로운 노드를 생성합니다.
+		Node* newNode = CreateNode(key, value);
+
+		// 3-1. 노드가 1개라도 존재하지 않을 경우
+		if (bucket[hashIndex].count == 0)
+		{
+			// bucket[hashIndex]의 head 포인터에 새로운 노드를 저장합니다.
+			bucket[hashIndex].head = newNode;
+
+			// bucket[hashIndex]의 count 변수의 값을 증가시킵니다.
+			bucket[hashIndex].count++;
+		}
+
+		// 3-2. 노드가 1개라도 존재할 경우
+		else
+		{
+			// newNode의 next에 bucket[hashIndex]의 head값을 저장합니다.
+			newNode->next = bucket[hashIndex].head;
+
+			// bucket[hashIndex].head를 방금 새로 생성한 노드의 주소를 가리키게 합니다.
+			bucket[hashIndex].head = newNode;
+
+			// bucket[hashIndex]의 count 변수의 값을 증가시킵니다.
+			bucket[hashIndex].count++;
+		}
+	}
+
+	void Remove(KEY key)
+	{
+		int hashIndex = HashFunction(key);
+
+		Node* CurrentNode = bucket[hashIndex].head;
+		Node* traceNode = nullptr;
+
+		while (key != CurrentNode->key)
+		{
+			traceNode = CurrentNode;
+			CurrentNode = CurrentNode->next;
+		}
+		if (traceNode == nullptr)
+		{
+
+		}
+		else
+		{
+			traceNode->next = CurrentNode->next;
+		}
+
+		delete CurrentNode;
+	}
+
+	void Show()
+	{
+		for (int i = 0; i < SIZE; i++)
+		{
+			Node* CurrentNode = bucket[i].head;
+			while (CurrentNode != nullptr)
+			{
+				cout << "[" << i << "]" << "KEY : " << CurrentNode->key << ", VALUE : " << CurrentNode->value << " | ";
+				CurrentNode = CurrentNode->next;
+			}
+			cout << endl;
+		}
 	}
 
 	~HashTable()
@@ -83,6 +163,17 @@ public:
 
 int main()
 {
+	HashTable<int, string> hashtable;
+
+	hashtable.Insert(10, "Soccer");
+	hashtable.Insert(27, "Baseball");
+	hashtable.Insert(14, "Tennis");
+	hashtable.Insert(97, "Basketball");
+	hashtable.Insert(16, "Swimming");
+	hashtable.Insert(22, "Swimming");
+	hashtable.Remove(22);
+
+	hashtable.Show();
 
 	return 0;
 }
