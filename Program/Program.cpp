@@ -1,59 +1,83 @@
 ﻿#include <iostream>
+#define SIZE 4
 using namespace std;
 
-#pragma region 그래프(Graph)
-// 요소들이 서로 복잡하게 연결되어 있는 관계를 표현하는 자료 구조이며
-// 정점과 간선들의 집합으로 구성되어 있습니다.
+template <typename T>
+class AdjacencyList
+{
+private:
+	struct Node
+	{
+		T data;
+		Node* next;
 
-// 정점(Vertex)
-// Node : 데이터가 저장되는 그래프의 기본 원소입니다.
+		Node(T data, Node* link = NULL)
+		{
+			this->data = data;
+			next = link;
+		}
+	};
 
-// 간선(Edge)
-// 노드들을 연결하는 선입니다.
+	int size; // 정점의 개수
+	T* vertex[SIZE]; // 정점의 집합
+	Node* list[SIZE]; // 인접 리스트
 
-// 인접 정점(Adjacent Vertex)
-// 간선으로 직접 연결된 정점을 의미합니다.
+public:
+	AdjacencyList()
+	{
+		size = 0;
 
-// 차수(Degree)
-// 정점에 연결된 간선의 수를 의미합니다.
+		for (int i = 0; i < SIZE; i++)
+		{
+			vertex[i] = list[i] = nullptr;
+		}
+	}
 
-// 경로(Path)
-// 정점들을 연결하는 간선들의 순서입니다.
+	void Insert(T data)
+	{
+		if (size >= SIZE)
+		{
+			cout << "Adjacency Matrix is Full" << endl;
+			return;
+		}
 
-// G = (V, E) : 정점과 간선으로 이루어진 집합
+		vertex[size++] = data;
+	}
 
-// 그래프의 종류
-// 1. 무방향 그래프(Undirected Graph)
-// 간선에 방향이 없는 그래프이다.
+	void Insert(int u, int v)
+	{
+		if (size == 0)
+		{
+			cout << "Adjacency Matrix is Empty" << endl;
+			return;
+		}
 
-// 2. 방향 그래프(Directed Graph)
-// 간선에 방향이 있는 그래프이다.
-// 진입 차수 : 다른 정점에서 들어오는 간선의 개수
-// 진출 차수 : 다른 정점으로 나가는 간선의 개수
+		if (u >= size || v >= size)
+		{
+			cout << "Out of Range" << endl;
+			return;
+		}
 
-// 3. 가중치 그래프(Weighted Graph)
-// 간선에 가중치가 있는 그래프입니다.
-
-// 길찾기 및 네트워크에 주로 사용
-#pragma endregion
-
-#pragma region 인접 행렬(Adjacency Matrix)
-// 정점들 간의 연결 관계를 이차원 배열로 표현하는 방식입니다.
-// 정점의 개수가 V일 때, V x V 크기의 이차원 배열을 사용합니다.
-
-// 장점
-// 1. 두 정점이 연결되어 있는 확인하기 쉽습니다.
-// 2. 두 정점 사이의 간선의 가중치를 쉽게 확인할 수 있습니다.
-
-// 단점
-// 1. 정점의 개수가 많을 때 메모리 낭비가 심합니다.
-// 2. 특정 정점과 연결된 정점을 찾을 때 시간이 오래 걸립니다.
-
-#pragma endregion
-
+		list[u] = new Node(data, list[u]);
+		list[v] = new Node(data, list[v]);
+	}
+};
 
 int main()
 {
+#pragma region 인접 리스트(Adjacency List)
+	// 그래프의 각 정점에 인접한 정점들을
+	// 연결 리스트로 표현하는 방법입니다.
+
+	// 장점
+	// 그래프의 모든 간선의 수를 O(V + E)로 표현할 수 있습니다.
+	// V : 정점, E : 간선
+
+	// 단점
+	// 두 정점을 연결하는 간선을 조회하거나 정점의 차수를 알기 위해서는
+	// 정점의 인접 리스트를 모두 탐색해야 하므로 정점의 차수만큼의 시간이 필요합니다.
+
+#pragma endregion
 
 	return 0;
 }
