@@ -1,81 +1,113 @@
 ﻿#include <iostream>
-#define SIZE 4
 using namespace std;
 
 template <typename T>
-class AdjacencyList
+class BinarySearchTree
 {
 private:
 	struct Node
 	{
 		T data;
-		Node* next;
-
-		Node(T data, Node* link = NULL)
-		{
-			this->data = data;
-			next = link;
-		}
+		Node* left;
+		Node* right;
 	};
 
-	int size; // 정점의 개수
-	T* vertex[SIZE]; // 정점의 집합
-	Node* list[SIZE]; // 인접 리스트
+	Node* root;
 
 public:
-	AdjacencyList()
+	BinarySearchTree()
 	{
-		size = 0;
+		root = nullptr;
+	}
 
-		for (int i = 0; i < SIZE; i++)
-		{
-			vertex[i] = list[i] = nullptr;
-		}
+	Node* CreateNode(T data)
+	{
+		Node* newNode = new Node;
+
+		newNode->data = data;
+		newNode->left = nullptr;
+		newNode->right = nullptr;
+
+		return newNode;
 	}
 
 	void Insert(T data)
 	{
-		if (size >= SIZE)
+		if (root == nullptr)
 		{
-			cout << "Adjacency Matrix is Full" << endl;
+			root = CreateNode(data);
 			return;
 		}
 
-		vertex[size++] = data;
+		Node * CurrentNode = root;
+		while (CurrentNode != nullptr)
+		{
+			if (data == CurrentNode->data)
+			{
+				return;
+			}
+			else if (data < CurrentNode->data)
+			{
+				if (CurrentNode->left == nullptr)
+				{
+					CurrentNode->left = CreateNode(data);
+					break;
+				}
+				else
+				{
+					CurrentNode = CurrentNode->left;
+				}
+			}
+			else
+			{
+				if (CurrentNode->right == nullptr)
+				{
+					CurrentNode->right = CreateNode(data);
+					break;
+				}
+				else
+				{
+					CurrentNode = CurrentNode->right;
+				}
+			}
+		}
 	}
 
-	void Insert(int u, int v)
+	void Find(T data)
 	{
-		if (size == 0)
+		if (root == nullptr)
 		{
-			cout << "Adjacency Matrix is Empty" << endl;
+			cout << "Tree is Empty" << endl;
 			return;
 		}
 
-		if (u >= size || v >= size)
+		Node* CurrentNode = root;
+		while (CurrentNode != nullptr)
 		{
-			cout << "Out of Range" << endl;
-			return;
+			if (data == CurrentNode->data)
+			{
+				cout << CurrentNode->data << endl;
+				return;
+			}
+			else if(data < CurrentNode->data)
+			{
+				CurrentNode = CurrentNode->left;
+			}
+			else if(data > CurrentNode->data)
+			{
+				CurrentNode = CurrentNode->right;
+			}
 		}
-
-		list[u] = new Node(data, list[u]);
-		list[v] = new Node(data, list[v]);
+		cout << "Not Found" << endl;
 	}
+
 };
 
 int main()
 {
-#pragma region 인접 리스트(Adjacency List)
-	// 그래프의 각 정점에 인접한 정점들을
-	// 연결 리스트로 표현하는 방법입니다.
-
-	// 장점
-	// 그래프의 모든 간선의 수를 O(V + E)로 표현할 수 있습니다.
-	// V : 정점, E : 간선
-
-	// 단점
-	// 두 정점을 연결하는 간선을 조회하거나 정점의 차수를 알기 위해서는
-	// 정점의 인접 리스트를 모두 탐색해야 하므로 정점의 차수만큼의 시간이 필요합니다.
+#pragma region 이진 탐색 트리(Binary Search Tree)
+	// 한 노드에 대해 왼쪽/오른쪽의 (최대) 두 개의 자식을 가질 수 있는 트리이며
+	// 왼쪽 자식은 부모 노드보다 작은 값, 오른쪽 자식은 부모 노드보다 큰 값을 가지는 탐색 트리입니다.
 
 #pragma endregion
 
