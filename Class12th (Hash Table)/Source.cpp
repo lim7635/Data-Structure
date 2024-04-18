@@ -1,224 +1,241 @@
-﻿#include <iostream>
-#define SIZE 6
+#include <iostream>
 using namespace std;
 
-#pragma region 해시 테이블(Hash Table)
-// (Key, Value)로 데이터를 저장하는 자료 구조 중 하나로
-// 빠르게 데이터를 검색할 수 있는 자료 구조입니다.
-
-// 해시 충돌을 해결하는 방법
-// 1. 체이닝 기법
-// 각 해시 버킷을 연결 리스트로 구성하는 방식입니다.
-// 해시 충돌 발생 시 동일한 해시 값에 해당하는 데이터들을 연결리스트로 연결하여 저장합니다.
-
-// 2. 개방 주소법
-// 충돌 발생 시 빈 버킷에 데이터를 저장하는 방식입니다.
-// 빈 버킷을 어떻게 결정할 지에 따라 구현 방식이 달라집니다.
-
-// 2.1 선형 탐사 : 충돌 발생 시 앞에서부터 차례대로 빈 버킷을 찾아 저장하는 방식입니다.
-// 2.2 이차 탐사 : 충돌 발생 시 2제곱 또는 2의 3제곱만큼 떨어진 빈 버킷을 찾아 값을 저장하는 방식입니다.
-// 2.3 이중 해싱 : 해시 값을 한번 더 해시 함수에서 다른 함수를 도출하는 방식입니다.
-
-template <typename KEY, typename VALUE>
-class HashTable
+template <typename T>
+class BinarySearchTree
 {
 private:
 	struct Node
 	{
-		KEY key;
-		VALUE value;
-
-		Node* next;
+		T data;
+		Node* left;
+		Node* right;
 	};
 
-	struct Bucket
-	{
-		int count;
-
-		Node* head;
-	};
-
-	Bucket bucket[SIZE];
+	Node* root;
 
 public:
-	HashTable()
+	BinarySearchTree()
 	{
-		for (int i = 0; i < SIZE; i++)
-		{
-			bucket[i].count = 0;
-			bucket[i].head = nullptr;
-		}
+		root = nullptr;
 	}
 
-	template <typename T>
-	int HashFunction(T key)
-	{
-		int hashIndex = (int)key % SIZE;
-
-		return hashIndex;
-	}
-
-	// HashFunction 템플릿 특수화
-	template <>
-	int HashFunction(string key)
-	{
-		int result = 0;
-		for (const char& element : key)
-		{
-			result += (int)element;
-		}
-
-		int hashIndex = result % SIZE;
-
-		return hashIndex;
-	}
-
-	Node* CreateNode(KEY key, VALUE value)
+	Node* CreateNode(T data)
 	{
 		Node* newNode = new Node;
 
-		newNode->key = key;
-		newNode->value = value;
-		newNode->next = nullptr;
+		newNode->data = data;
+		newNode->left = nullptr;
+		newNode->right = nullptr;
 
 		return newNode;
 	}
 
-	void Insert(KEY key, VALUE value)
+	void Insert(T data)
 	{
-		// 1. 해시 함수를 통해서 값을 받는 임시 변수를 만듭니다.
-		int hashIndex = HashFunction(key);
-
-		// 2. 새로운 노드를 생성합니다.
-		Node* newNode = CreateNode(key, value);
-
-		// 3-1. 노드가 1개라도 존재하지 않을 경우
-		if (bucket[hashIndex].count == 0)
+		if (root == nullptr)
 		{
-			// bucket[hashIndex]의 head 포인터에 새로운 노드를 저장합니다.
-			bucket[hashIndex].head = newNode;
-
-			// bucket[hashIndex]의 count 변수의 값을 증가시킵니다.
-			bucket[hashIndex].count++;
-		}
-
-		// 3-2. 노드가 1개라도 존재할 경우
-		else
-		{
-			// newNode의 next에 bucket[hashIndex]의 head값을 저장합니다.
-			newNode->next = bucket[hashIndex].head;
-
-			// bucket[hashIndex].head를 방금 새로 생성한 노드의 주소를 가리키게 합니다.
-			bucket[hashIndex].head = newNode;
-
-			// bucket[hashIndex]의 count 변수의 값을 증가시킵니다.
-			bucket[hashIndex].count++;
-		}
-	}
-
-	void Remove(KEY key)
-	{
-		// 1. 해시 함수를 통해서 값을 받는 임시 변수
-		int hashIndex = HashFunction(key);
-
-		// 2. 노드를 탐색할 수 있는 순회용 포인터 변수 선언
-		Node* CurrentNode = bucket[hashIndex].head;
-
-		// 3. 이전 노드를 저장할 수 있는 포인터 변수 선언
-		Node* traceNode = nullptr;
-
-		// 4. CurrentNode가 nullptr이라고 하면 함수 종료
-		if (CurrentNode == nullptr)
-		{
-			cout << "Not Key Found" << endl;
+			root = CreateNode(data);
 			return;
 		}
 
-		// 5. CurrentNode를 이용해서 내가 찾고자 하는 key 값을 찾습니다.
+		Node* CurrentNode = root;
 		while (CurrentNode != nullptr)
 		{
-			// CurrentNode->key 값과 내가 삭제하고 싶은 key 값이 같을 경우
-			if (CurrentNode->key == key)
+			if (data == CurrentNode->data)
 			{
-				// 내가 삭제하고자 하는 key가 head에 있는 노드일 경우
-				if (CurrentNode == bucket[hashIndex].head)
-				{
-					bucket[hashIndex].head = CurrentNode->next;
-				}
-
-				// 내가 삭제하고자 하는 key가 중간에 있는 노드일 경우
-				else
-				{
-					traceNode->next = CurrentNode->next;
-				}
-
-				// 6. 각 bucket의 카운트 값을 감소시킵니다.
-				bucket[hashIndex].count--;
-
-				// 7. 해당 메모리를 삭제시킵니다.
-				delete CurrentNode;
-
 				return;
 			}
-			traceNode = CurrentNode;
-			CurrentNode = CurrentNode->next;
-		}
-		cout << "Not Key Found" << endl;
-	}
-
-	void Show()
-	{
-		for (int i = 0; i < SIZE; i++)
-		{
-			Node* CurrentNode = bucket[i].head;
-			while (CurrentNode != nullptr)
+			else if (data < CurrentNode->data)
 			{
-				cout << "[" << i << "]" << "KEY : " << CurrentNode->key << ", VALUE : " << CurrentNode->value << " | ";
-				CurrentNode = CurrentNode->next;
-			}
-			cout << endl;
-		}
-	}
-
-	~HashTable()
-	{
-		for (int i = 0; i < SIZE; i++)
-		{
-			Node* DeleteNode = bucket[i].head;
-			Node* NextNode = bucket[i].head;
-
-			if (bucket[i].head == nullptr)
-			{
-				continue;
+				if (CurrentNode->left == nullptr)
+				{
+					CurrentNode->left = CreateNode(data);
+					break;
+				}
+				else
+				{
+					CurrentNode = CurrentNode->left;
+				}
 			}
 			else
 			{
-				while (NextNode != nullptr)
+				if (CurrentNode->right == nullptr)
 				{
-					NextNode = DeleteNode->next;
-					delete DeleteNode;
-					DeleteNode = NextNode;
+					CurrentNode->right = CreateNode(data);
+					break;
+				}
+				else
+				{
+					CurrentNode = CurrentNode->right;
 				}
 			}
 		}
 	}
+
+	bool Find(T data)
+	{
+		if (root == nullptr)
+		{
+			return false;
+		}
+
+		Node* CurrentNode = root;
+		while (CurrentNode != nullptr)
+		{
+			if (data == CurrentNode->data)
+			{
+				return true;
+			}
+			else if (data < CurrentNode->data)
+			{
+				CurrentNode = CurrentNode->left;
+			}
+			else if (data > CurrentNode->data)
+			{
+				CurrentNode = CurrentNode->right;
+			}
+		}
+		return false;
+	}
+
+	// 1. 자식 노드가 없는 노드를 삭제하는 경우
+
+	void Remove(T data)
+	{
+		if (root == nullptr)
+		{
+			cout << "Binary Search Tree is empty." << endl;
+			return;
+		}
+
+		Node* ParentNode = nullptr;
+		Node* CurrentNode = root;
+		while (CurrentNode->data != data)
+		{
+			ParentNode = CurrentNode;
+			if (data < CurrentNode->data)
+			{
+				CurrentNode = CurrentNode->left;
+			}
+			else if (data > ParentNode->data)
+			{
+				CurrentNode = CurrentNode->right;
+			}
+		}
+
+		if (CurrentNode == nullptr)
+		{
+			cout << "Node is not Found." << endl;
+			return;
+		}
+
+		// 1. 자식 노드가 없는 노드를 삭제하는 경우
+		if (CurrentNode->left == nullptr && CurrentNode->right == nullptr)
+		{
+			if (ParentNode != nullptr)
+			{
+				if (CurrentNode == ParentNode->left)
+				{
+					ParentNode->left = nullptr;
+				}
+				else if (CurrentNode == ParentNode->right)
+				{
+					ParentNode->right = nullptr;
+				}
+			}
+			else
+			{
+				root = nullptr;
+			}
+		}
+
+		// 2. 자식 노드가 1개인 노드를 삭제하는 경우
+		else if (CurrentNode->left == nullptr || CurrentNode->right == nullptr)
+		{
+			Node* ChildNode = nullptr;
+			if (CurrentNode->left != nullptr)
+			{
+				ChildNode = CurrentNode->left;
+			}
+			else if (CurrentNode->right != nullptr)
+			{
+				ChildNode = CurrentNode->right;
+			}
+
+			if (ParentNode != nullptr)
+			{
+				if (ParentNode->left == CurrentNode)
+				{
+					ParentNode->left = ChildNode;
+				}
+				else
+				{
+					ParentNode->right = ChildNode;
+				}
+			}
+		}
+
+		// 3. 자식 노드가 2개인 노드를 삭제하는 경우
+		else
+		{
+			Node* ChildNode = CurrentNode->right;
+			Node* TraceNode = CurrentNode;
+			while (ChildNode->left != nullptr)
+			{
+				TraceNode = ChildNode;
+				ChildNode = ChildNode->left;
+			}
+
+			if (TraceNode->left == TraceNode)
+			{
+				TraceNode->left = ChildNode->right;
+			}
+			else
+			{
+				TraceNode->right = ChildNode->right;
+			}
+			CurrentNode->data = ChildNode->data;
+
+			delete ChildNode;
+			return;
+		}
+		delete CurrentNode;
+	}
+
+	void Destroy(Node * root)
+	{
+		if (root != nullptr)
+		{
+			Destroy(root->left);
+			Destroy(root->right);
+			delete root;
+		}
+	}
+
+	~BinarySearchTree()
+	{
+		Destroy(root);
+	}
 };
-#pragma endregion
 
 int main()
 {
-	HashTable<int, string> hashtable;
+#pragma region 이진 탐색 트리(Binary Search Tree)
+	// 한 노드에 대해 왼쪽/오른쪽의 (최대) 두 개의 자식을 가질 수 있는 트리이며
+	// 왼쪽 자식은 부모 노드보다 작은 값, 오른쪽 자식은 부모 노드보다 큰 값을 가지는 탐색 트리입니다.
 
-	hashtable.Insert(10, "Soccer");
-	hashtable.Insert(27, "Baseball");
-	hashtable.Insert(14, "Tennis");
-	hashtable.Insert(97, "Basketball");
-	hashtable.Insert(16, "Swimming");
-	hashtable.Insert(22, "Golf");
-	hashtable.Remove(27);
-	hashtable.Remove(10);
+	BinarySearchTree<int> binarysearchtree;
 
-	hashtable.Show();
+	binarysearchtree.Insert(100);
+	binarysearchtree.Insert(90);
+	binarysearchtree.Insert(10);
+	binarysearchtree.Insert(20);
+	binarysearchtree.Insert(30);
+	binarysearchtree.Insert(50);
+	binarysearchtree.Insert(40);
+
+#pragma endregion
 
 	return 0;
 }
