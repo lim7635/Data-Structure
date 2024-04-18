@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 using namespace std;
 
 template <typename T>
@@ -100,7 +100,6 @@ public:
 	}
 
 	// 1. 자식 노드가 없는 노드를 삭제하는 경우
-	// 2. 
 
 	void Remove(T data)
 	{
@@ -199,10 +198,25 @@ public:
 			CurrentNode->data = ChildNode->data;
 
 			delete ChildNode;
+			return;
 		}
 		delete CurrentNode;
 	}
 
+	void Destroy(Node * root)
+	{
+		if (root != nullptr)
+		{
+			Destroy(root->left);
+			Destroy(root->right);
+			delete root;
+		}
+	}
+
+	~BinarySearchTree()
+	{
+		Destroy(root);
+	}
 };
 
 int main()
