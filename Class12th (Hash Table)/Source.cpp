@@ -71,59 +71,59 @@ public:
 
 	void Insert(KEY key, VALUE value)
 	{
-		// 해시 함수를 통해서 값을 받는 임시 변수
+		// ?�시 ?�수�??�해??값을 받는 ?�시 변??
 		int hashIndex = HashFunction(key);
 
-		// 새로운 노드를 생성합니다.
+		// ?�로???�드�??�성?�니??
 		Node* newNode = CreateNode(key, value);
 
-		// 노드가 1개라도 존재하지 않는다면
+		// ?�드가 1개라??존재?��? ?�는?�면
 		if (bucket[hashIndex].count == 0)
 		{
-			// 1. bucket[hashIndex]의 head 포인터에 새로운 노드를 저장합니다.
+			// 1. bucket[hashIndex]??head ?�인?�에 ?�로???�드�??�?�합?�다.
 			bucket[hashIndex].head = newNode;
 
-			// 2. bucket[hashIndex]의 count 변수의 값을 증가시킵니다.
+			// 2. bucket[hashIndex]??count 변?�의 값을 증�??�킵?�다.
 			bucket[hashIndex].count++;
 		}
-		else // 노드가 1개라도 존재한다면
+		else // ?�드가 1개라??존재?�다�?
 		{
-			// 1. newNode의 next에 bucket[hashIndex]의 head값을 저장합니다.
+			// 1. newNode??next??bucket[hashIndex]??head값을 ?�?�합?�다.
 			newNode->next = bucket[hashIndex].head;
 
-			// 2. bucket[hashIndex].head를 방금 새로 생성한 노드의 주소를 가리키게 합니다.
+			// 2. bucket[hashIndex].head�?방금 ?�로 ?�성???�드??주소�?가리키�??�니??
 			bucket[hashIndex].head = newNode;
 
-			// 3. bucket[hashIndex]의 count 변수의 값을 증가시킵니다.
+			// 3. bucket[hashIndex]??count 변?�의 값을 증�??�킵?�다.
 			bucket[hashIndex].count++;
 		}
 	}
 
 	void Remove(KEY key)
 	{
-		// 1. 해시 함수를 통해서 값을 받는 임시 변수
+		// 1. ?�시 ?�수�??�해??값을 받는 ?�시 변??
 		int hashIndex = HashFunction(key);
 
-		// 2. Node를 탐색할 수 있는 순회용 포인터 변수 선언
+		// 2. Node�??�색?????�는 ?�회???�인??변???�언
 		Node* currentNode = bucket[hashIndex].head;
 
-		// 3. 이전 노드를 저장할 수 있는 포인터 변수 선언
+		// 3. ?�전 ?�드�??�?�할 ???�는 ?�인??변???�언
 		Node* traceNode = nullptr;
 
-		// 4. currentNode가 nullptr이라고 하면 함수를 종료합니다.
+		// 4. currentNode가 nullptr?�라�??�면 ?�수�?종료?�니??
 		if (currentNode == nullptr)
 		{
 			cout << "Not Key Found" << endl;
 			return;
 		}
 
-		// 5. currentNode를 이용해서 내가 찾고자 하는 key 값을 찾습니다.
+		// 5. currentNode�??�용?�서 ?��? 찾고???�는 key 값을 찾습?�다.
 		while (currentNode != nullptr)
 		{
-			// currentNode->key 값과 내가 삭제하고 싶은 key값이 같다면
+			// currentNode->key 값과 ?��? ??��?�고 ?��? key값이 같다�?
 			if (currentNode->key == key)
 			{
-				// 내가 삭제하고자 하는 key가 head에 있는 노드라면
+				// ?��? ??��?�고???�는 key가 head???�는 ?�드?�면
 				if (currentNode == bucket[hashIndex].head)
 				{
 					bucket[hashIndex].head = currentNode->next;
@@ -133,10 +133,10 @@ public:
 					traceNode->next = currentNode->next;
 				}
 
-				// 각 bucket의 카운트 값을 감소시킵니다.
+				// �?bucket??카운??값을 감소?�킵?�다.
 				bucket[hashIndex].count--;
 
-				// 해당 메모리를 삭제합니다.
+				// ?�당 메모리�? ??��?�니??
 				delete currentNode;
 
 				return;
@@ -194,31 +194,31 @@ public:
 
 int main()
 {
-#pragma region 해시 테이블
-	// (Key, Value)로 데이터를 저장하는 자료 구조 중 하나로
-	// 빠르게 데이터를 검색할 수 있는 자료 구조입니다.
+#pragma region ?�시 ?�이�?
+	// (Key, Value)�??�이?��? ?�?�하???�료 구조 �??�나�?
+	// 빠르�??�이?��? 검?�할 ???�는 ?�료 구조?�니??
 
-	// 해시 충돌을 해결하는 방법
+	// ?�시 충돌???�결?�는 방법
 
-	// <체이닝 기법>
-	// 각 해시 버킷을 연결 리스트로 구성하는 방식입니다.
+	// <체이??기법>
+	// �??�시 버킷???�결 리스?�로 구성?�는 방식?�니??
 
-	// 해시 충돌 발생 시 동일한 해시 값에 해당하는 데이터들을
-	// 연결리스트로 연결하여 저장합니다.
+	// ?�시 충돌 발생 ???�일???�시 값에 ?�당?�는 ?�이?�들??
+	// ?�결리스?�로 ?�결?�여 ?�?�합?�다.
 
-	// <개방 주소법>
-	// 충돌 발생 시 빈 버켓에 데이터를 저장하는 방식입니다.
+	// <개방 주소�?
+	// 충돌 발생 ??�?버켓???�이?��? ?�?�하??방식?�니??
 
-	// 빈 버킷을 어떻게 결정할 지에 따라 구현 방식이 달라집니다.
+	// �?버킷???�떻�?결정??지???�라 구현 방식???�라집니??
 
-	// 선형 탐사 : 충돌 발생 시 앞에서 부터 차례대로 빈 버킷을
-	// 찾아 저장하는 방식입니다.
+	// ?�형 ?�사 : 충돌 발생 ???�에??부??차�??��?�?버킷??
+	// 찾아 ?�?�하??방식?�니??
 
-	// 이차 탐사 : 충돌 발생 시 2^, 2^3 만큼 떨어진 빈 버킷을 
-	// 찾아 값을 저장하는 방식입니다.
+	// ?�차 ?�사 : 충돌 발생 ??2^, 2^3 만큼 ?�어�?�?버킷??
+	// 찾아 값을 ?�?�하??방식?�니??
 
-	// 이중 해싱 : 해시 값을 한번 더 해시 함수에서 다른 함수를
-	// 도출하는 방식입니다.
+	// ?�중 ?�싱 : ?�시 값을 ?�번 ???�시 ?�수?�서 ?�른 ?�수�?
+	// ?�출?�는 방식?�니??
 #pragma endregion
 
 	HashTable<int, string> hashTable;

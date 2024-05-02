@@ -99,8 +99,6 @@ public:
 		return false;
 	}
 
-	// 1. 자식 노드가 없는 노드를 삭제하는 경우
-
 	void Remove(T data)
 	{
 		if (root == nullptr)
@@ -130,7 +128,7 @@ public:
 			return;
 		}
 
-		// 1. 자식 노드가 없는 노드를 삭제하는 경우
+		// 1. �ڽ� ��尡 ���� ��带 �����ϴ� ���
 		if (CurrentNode->left == nullptr && CurrentNode->right == nullptr)
 		{
 			if (ParentNode != nullptr)
@@ -150,7 +148,7 @@ public:
 			}
 		}
 
-		// 2. 자식 노드가 1개인 노드를 삭제하는 경우
+		// 2. �ڽ� ��尡 1���� ��带 �����ϴ� ���
 		else if (CurrentNode->left == nullptr || CurrentNode->right == nullptr)
 		{
 			Node* ChildNode = nullptr;
@@ -176,7 +174,7 @@ public:
 			}
 		}
 
-		// 3. 자식 노드가 2개인 노드를 삭제하는 경우
+		// 3. �ڽ� ��尡 2���� ��带 �����ϴ� ���
 		else
 		{
 			Node* ChildNode = CurrentNode->right;
@@ -221,9 +219,9 @@ public:
 
 int main()
 {
-#pragma region 이진 탐색 트리(Binary Search Tree)
-	// 한 노드에 대해 왼쪽/오른쪽의 (최대) 두 개의 자식을 가질 수 있는 트리이며
-	// 왼쪽 자식은 부모 노드보다 작은 값, 오른쪽 자식은 부모 노드보다 큰 값을 가지는 탐색 트리입니다.
+#pragma region ���� Ž�� Ʈ��(Binary Search Tree)
+	// �� ��忡 ���� ����/�������� (�ִ�) �� ���� �ڽ��� ���� �� �ִ� Ʈ���̸�
+	// ���� �ڽ��� �θ� ��庸�� ���� ��, ������ �ڽ��� �θ� ��庸�� ū ���� ������ Ž�� Ʈ���Դϴ�.
 
 	BinarySearchTree<int> binarysearchtree;
 
